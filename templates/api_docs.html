@@ -1,0 +1,325 @@
+<!-- templates/api_docs.html - API对接文档页面 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AC云验证 - API对接文档</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f5f5f7;
+            color: #1d1c1f;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 12px 24px;
+            border-bottom: 0.5px solid rgba(60, 60, 67, 0.08);
+        }
+        
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .logo i {
+            font-size: 24px;
+            background: linear-gradient(135deg, #007aff, #5856d6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 24px 40px;
+        }
+        
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 24px;
+            border: 0.5px solid rgba(60, 60, 67, 0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+        
+        .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-left: 12px;
+            border-left: 4px solid #007aff;
+        }
+        
+        .api-item {
+            background: #f5f5f7;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .api-method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+        
+        .method-post {
+            background: #34c759;
+            color: white;
+        }
+        
+        .method-get {
+            background: #007aff;
+            color: white;
+        }
+        
+        .api-url {
+            font-family: monospace;
+            font-size: 14px;
+            color: #007aff;
+        }
+        
+        .param-table {
+            width: 100%;
+            margin-top: 12px;
+            border-collapse: collapse;
+        }
+        
+        .param-table th, .param-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 0.5px solid rgba(60, 60, 67, 0.08);
+        }
+        
+        .param-table th {
+            color: #6c6c70;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        code {
+            background: #f5f5f7;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        
+        pre {
+            background: #1d1c1f;
+            color: #f5f5f7;
+            padding: 16px;
+            border-radius: 14px;
+            overflow-x: auto;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007aff;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 12px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: #6c6c70;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>AC云验证</span>
+            </div>
+            <a href="/" style="color: #007aff; text-decoration: none;">返回首页</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="card">
+            <div class="card-title">API对接文档</div>
+            <p style="color: #6c6c70; margin-bottom: 16px;">以下是AC云验证平台提供的API接口，供C++/其他语言客户端对接使用。</p>
+            <div style="background: #f5f5f7; border-radius: 14px; padding: 16px;">
+                <h4><i class="fas fa-link"></i> 基础地址</h4>
+                <code>http://{{ request.host }}/api/</code>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">1. 卡密验证接口</div>
+            <div class="api-item">
+                <span class="api-method method-post">POST</span>
+                <span class="api-url">/api/verify</span>
+                <p style="margin-top: 12px;">验证卡密有效性，支持普通卡和设备卡。</p>
+                <h4 style="margin: 12px 0 8px;">请求参数</h4>
+                <table class="param-table">
+                    <thead><tr><th>参数名</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td>card_password</td><td>string</td><td>是</td><td>卡密号码</td></tr>
+                        <tr><td>instance_id</td><td>string</td><td>是</td><td>实例ID</td></tr>
+                        <tr><td>device_id</td><td>string</td><td>设备卡必填</td><td>设备唯一标识</td></tr>
+                        <tr><td>user_id</td><td>string</td><td>否</td><td>用户ID</td></tr>
+                    </tbody>
+                </table>
+                <h4 style="margin: 12px 0 8px;">返回示例</h4>
+                <pre>{
+    "code": 1,
+    "message": "验证成功",
+    "card_type": "normal",
+    "valid_days": 30,
+    "remaining_days": 25,
+    "expire_time": 1735689600
+}</pre>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">2. 云更新接口</div>
+            <div class="api-item">
+                <span class="api-method method-post">POST</span>
+                <span class="api-url">/api/check_update</span>
+                <p style="margin-top: 12px;">检查是否有新版本可用。</p>
+                <table class="param-table">
+                    <thead><tr><th>参数名</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td>user_id</td><td>string</td><td>是</td><td>用户ID</td></tr>
+                        <tr><td>instance_id</td><td>string</td><td>是</td><td>实例ID</td></tr>
+                        <tr><td>current_version</td><td>string</td><td>否</td><td>当前版本号</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="api-item">
+                <span class="api-method method-get">GET</span>
+                <span class="api-url">/api/download/{user_id}/{instance_id}/{version}</span>
+                <p style="margin-top: 12px;">下载更新文件，会自动扣除流量。</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">3. 公告接口</div>
+            <div class="api-item">
+                <span class="api-method method-post">POST</span>
+                <span class="api-url">/api/get_announcement</span>
+                <p style="margin-top: 12px;">获取实例公告内容。</p>
+                <table class="param-table">
+                    <thead><tr><th>参数名</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td>instance_id</td><td>string</td><td>是</td><td>实例ID</td></tr>
+                        <tr><td>user_id</td><td>string</td><td>否</td><td>用户ID</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">4. 配置获取接口</div>
+            <div class="api-item">
+                <span class="api-method method-post">POST</span>
+                <span class="api-url">/api/get_config</span>
+                <p style="margin-top: 12px;">获取实例的加密配置信息。</p>
+                <table class="param-table">
+                    <thead><tr><th>参数名</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
+                    <tbody>
+                        <tr><td>instance_id</td><td>string</td><td>是</td><td>实例ID</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="api-item">
+                <span class="api-method method-get">GET</span>
+                <span class="api-url">/api/get_server_time</span>
+                <p style="margin-top: 12px;">获取服务器时间戳。</p>
+            </div>
+        </div>
+        
+        {% if settings.get('enable_encryption', True) %}
+        <div class="card">
+            <div class="card-title">5. 加密传输说明</div>
+            <p>当前加密传输已<span style="color: #34c759;">开启</span>，所有API请求需要按照以下格式封装：</p>
+            <pre>{
+    "data": "base64编码后的请求数据",
+    "sign": "MD5(data + sign_key) 或 HMAC-SHA256签名",
+    "timestamp": 1234567890
+}</pre>
+            <p style="margin-top: 12px;">响应数据格式相同，需要先验证签名再解密。</p>
+            <h4 style="margin: 16px 0 8px;">C++示例代码</h4>
+            <pre>// 1. 先调用 /api/get_config 获取加密配置
+// 2. 使用获取到的 sign_key 进行签名
+// 3. 将请求数据base64编码后放入data字段
+// 4. 计算签名并放入sign字段
+// 5. 发送请求</pre>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-title">5. 加密传输说明</div>
+            <p>当前加密传输已<span style="color: #ff9500;">关闭</span>，可以直接发送JSON请求。</p>
+        </div>
+        {% endif %}
+        
+        <div class="card">
+            <div class="card-title">错误码说明</div>
+            <table class="param-table">
+                <thead><tr><th>错误码</th><th>说明</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>成功</td></tr>
+                    <tr><td>0</td><td>通用错误</td></tr>
+                    <tr><td>10001</td><td>卡密已过期</td></tr>
+                    <tr><td>10002</td><td>卡密不存在</td></tr>
+                    <tr><td>10003</td><td>实例不存在</td></tr>
+                    <tr><td>10004</td><td>实例未运行</td></tr>
+                    <tr><td>10011</td><td>需要设备ID进行绑定</td></tr>
+                    <tr><td>10012</td><td>设备卡已绑定其他设备</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2026 AC云验证平台 | API版本 1.0</p>
+        </div>
+    </div>
+</body>
+</html>

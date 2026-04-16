@@ -1,0 +1,635 @@
+<!-- templates/admin.html - iOS风格管理后台 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AC云验证 - 管理后台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f5f5f7;
+            color: #1d1c1f;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 0.5px solid rgba(60, 60, 67, 0.08);
+        }
+        
+        .header h2 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .logout-btn {
+            background: #ff3b30;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .container {
+            display: flex;
+            padding-top: 60px;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 0.5px solid rgba(60, 60, 67, 0.08);
+            padding: 20px;
+            position: fixed;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+        }
+        
+        .sidebar button {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: transparent;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 15px;
+            font-weight: 500;
+            color: #6c6c70;
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar button:hover {
+            background: rgba(0, 122, 255, 0.1);
+            color: #007aff;
+        }
+        
+        .main {
+            flex: 1;
+            margin-left: 260px;
+            padding: 24px;
+        }
+        
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 0.5px solid rgba(60, 60, 67, 0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-left: 12px;
+            border-left: 4px solid #007aff;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #6c6c70;
+            font-size: 13px;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            background: #f5f5f7;
+            border: 0.5px solid rgba(60, 60, 67, 0.08);
+            border-radius: 14px;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #007aff;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background: #007aff;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #ff3b30;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #34c759;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #ff9500;
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 0.5px solid rgba(60, 60, 67, 0.08);
+        }
+        
+        th {
+            color: #6c6c70;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .panel {
+            display: none;
+        }
+        
+        .panel.active {
+            display: block;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: #f5f5f7;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #007aff;
+        }
+        
+        .status-running {
+            background: #34c759;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        .status-stopped {
+            background: #ff3b30;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            .main {
+                margin-left: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2><i class="fas fa-shield-alt"></i> AC云验证管理后台</h2>
+        <button class="logout-btn" onclick="logout()">退出登录</button>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <button onclick="switchPanel('dashboard')"><i class="fas fa-tachometer-alt"></i> 仪表盘</button>
+            <button onclick="switchPanel('users')"><i class="fas fa-users"></i> 用户管理</button>
+            <button onclick="switchPanel('settings')"><i class="fas fa-sliders-h"></i> 系统设置</button>
+            <button onclick="switchPanel('instances')"><i class="fas fa-server"></i> 实例管理</button>
+            <button onclick="switchPanel('encryption')"><i class="fas fa-lock"></i> 加密设置</button>
+            <button onclick="switchPanel('docs')"><i class="fas fa-file-alt"></i> 对接文档</button>
+        </div>
+        <div class="main">
+            <!-- 仪表盘 -->
+            <div id="dashboardPanel" class="panel active">
+                <div class="stats-grid" id="statsGrid"></div>
+                <div class="card">
+                    <div class="card-title">快速操作</div>
+                    <button class="btn btn-primary" onclick="switchPanel('users')">管理用户</button>
+                    <button class="btn btn-primary" onclick="switchPanel('settings')">系统设置</button>
+                </div>
+            </div>
+            
+            <!-- 用户管理 -->
+            <div id="usersPanel" class="panel">
+                <div class="card">
+                    <div class="card-title">用户列表</div>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr><th>用户ID</th><th>用户名</th><th>邮箱</th><th>余额</th><th>VIP</th><th>状态</th><th>操作</th></tr>
+                            </thead>
+                            <tbody id="usersTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 系统设置 -->
+            <div id="settingsPanel" class="panel">
+                <div class="card">
+                    <div class="card-title">基础设置</div>
+                    <div class="form-group"><label>网站名称</label><input type="text" id="siteName"></div>
+                    <div class="form-group"><label>默认注册余额</label><input type="number" id="defaultBalance" step="0.01"></div>
+                    <div class="form-group"><label>签到奖励</label><input type="number" id="signReward" step="0.01"></div>
+                    <div class="form-group"><label>连续签到奖励</label><input type="number" id="continuousReward" step="0.01"></div>
+                    <div class="form-group"><label>创建应用价格</label><input type="number" id="createInstancePrice" step="0.01"></div>
+                    <button class="btn btn-primary" onclick="saveBasicSettings()">保存设置</button>
+                </div>
+                <div class="card">
+                    <div class="card-title">VIP价格设置</div>
+                    <div class="form-group"><label>月卡</label><input type="number" id="monthPrice" step="0.01"></div>
+                    <div class="form-group"><label>季卡</label><input type="number" id="seasonPrice" step="0.01"></div>
+                    <div class="form-group"><label>半年卡</label><input type="number" id="halfYearPrice" step="0.01"></div>
+                    <div class="form-group"><label>年卡</label><input type="number" id="yearPrice" step="0.01"></div>
+                    <button class="btn btn-primary" onclick="saveVipPrices()">保存VIP价格</button>
+                </div>
+                <div class="card">
+                    <div class="card-title">流量价格设置</div>
+                    <div class="form-group"><label>1GB</label><input type="number" id="traffic1gbPrice" step="0.01"></div>
+                    <div class="form-group"><label>10GB</label><input type="number" id="traffic10gbPrice" step="0.01"></div>
+                    <div class="form-group"><label>30GB</label><input type="number" id="traffic30gbPrice" step="0.01"></div>
+                    <div class="form-group"><label>100GB</label><input type="number" id="traffic100gbPrice" step="0.01"></div>
+                    <div class="form-group"><label>500GB</label><input type="number" id="traffic500gbPrice" step="0.01"></div>
+                    <button class="btn btn-primary" onclick="saveTrafficPrices()">保存流量价格</button>
+                </div>
+                <div class="card">
+                    <div class="card-title">卡密价格设置</div>
+                    <div class="form-group"><label>普通卡价格</label><input type="number" id="normalCardPrice" step="0.01"></div>
+                    <div class="form-group"><label>设备卡价格</label><input type="number" id="deviceCardPrice" step="0.01"></div>
+                    <button class="btn btn-primary" onclick="saveCardPrices()">保存卡密价格</button>
+                </div>
+                <div class="card">
+                    <div class="card-title">邮件设置</div>
+                    <div class="form-group"><label>SMTP服务器</label><input type="text" id="smtpServer"></div>
+                    <div class="form-group"><label>SMTP端口</label><input type="number" id="smtpPort"></div>
+                    <div class="form-group"><label>发件邮箱</label><input type="email" id="senderEmail"></div>
+                    <div class="form-group"><label>邮箱密码</label><input type="password" id="emailPassword"></div>
+                    <button class="btn btn-primary" onclick="saveMailSettings()">保存邮件设置</button>
+                </div>
+            </div>
+            
+            <!-- 实例管理 -->
+            <div id="instancesPanel" class="panel">
+                <div class="card">
+                    <div class="card-title">所有实例</div>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr><th>用户</th><th>应用名称</th><th>应用ID</th><th>状态</th> </thead>
+                            <tbody id="allInstancesTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 加密设置 -->
+            <div id="encryptionPanel" class="panel">
+                <div class="card">
+                    <div class="card-title">加密传输设置</div>
+                    <div class="form-group">
+                        <label>启用加密传输</label>
+                        <select id="enableEncryption">
+                            <option value="true">开启</option>
+                            <option value="false">关闭</option>
+                        </select>
+                        <p style="font-size: 12px; color: #6c6c70; margin-top: 8px;">开启后，所有API请求将使用签名和加密进行传输验证</p>
+                    </div>
+                    <div class="form-group">
+                        <label>加密方式</label>
+                        <select id="encryptionMethod">
+                            <option value="base64">Base64编码</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>签名方式</label>
+                        <select id="signMethod">
+                            <option value="md5">MD5签名</option>
+                            <option value="hmac_sha256">HMAC-SHA256签名</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveEncryptionSettings()">保存加密设置</button>
+                </div>
+            </div>
+            
+            <!-- 对接文档 -->
+            <div id="docsPanel" class="panel">
+                <div class="card">
+                    <div class="card-title">上传对接文档</div>
+                    <div class="form-group">
+                        <label>选择文件</label>
+                        <input type="file" id="docFile">
+                    </div>
+                    <button class="btn btn-primary" onclick="uploadDoc()">上传文档</button>
+                </div>
+                <div class="card">
+                    <div class="card-title">已上传文档</div>
+                    <div id="docsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let allUsers = [];
+        
+        function logout() { window.location.href = '/logout'; }
+        
+        function switchPanel(panel) {
+            $('.panel').removeClass('active');
+            $('#' + panel + 'Panel').addClass('active');
+            if (panel === 'dashboard') loadStats();
+            if (panel === 'users') loadUsers();
+            if (panel === 'settings') loadSettings();
+            if (panel === 'instances') loadAllInstances();
+            if (panel === 'encryption') loadEncryptionSettings();
+            if (panel === 'docs') loadDocsList();
+        }
+        
+        async function loadStats() {
+            const res = await fetch('/api/admin/stats');
+            const data = await res.json();
+            if (data.code === 1) {
+                $('#statsGrid').html(`
+                    <div class="stat-card"><div class="stat-value">${data.total_users}</div><div>总用户数</div></div>
+                    <div class="stat-card"><div class="stat-value">${data.total_instances}</div><div>总实例数</div></div>
+                    <div class="stat-card"><div class="stat-value">${data.total_cards}</div><div>总卡密数</div></div>
+                    <div class="stat-card"><div class="stat-value">¥${data.total_balance}</div><div>总余额</div></div>
+                    <div class="stat-card"><div class="stat-value">${data.vip_count}</div><div>VIP用户数</div></div>
+                `);
+            }
+        }
+        
+        async function loadUsers() {
+            const res = await fetch('/api/admin/users');
+            const data = await res.json();
+            if (data.code === 1) {
+                allUsers = data.users;
+                let html = '';
+                data.users.forEach(u => {
+                    html += `<tr>
+                        <td>${u.user_id}</td>
+                        <td>${u.display_name}</td>
+                        <td>${u.email || '-'}</td>
+                        <td>¥${u.balance}</td>
+                        <td>${u.is_vip ? 'VIP' : '普通'}</td>
+                        <td>${u.is_banned ? '封禁' : '正常'}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="toggleBan('${u.user_id}')">${u.is_banned ? '解封' : '封禁'}</button>
+                            <button class="btn btn-success btn-sm" onclick="addBalance('${u.user_id}')">充值</button>
+                            <button class="btn btn-primary btn-sm" onclick="addVip('${u.user_id}')">开VIP</button>
+                            <button class="btn btn-warning btn-sm" onclick="addTraffic('${u.user_id}')">加流量</button>
+                        </td>
+                    </tr>`;
+                });
+                $('#usersTable').html(html);
+            }
+        }
+        
+        async function toggleBan(user_id) {
+            const res = await fetch('/api/admin/user/ban', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id }) });
+            alert((await res.json()).message);
+            loadUsers();
+        }
+        
+        async function addBalance(user_id) {
+            const amount = prompt('充值金额（元）');
+            if (amount) {
+                const res = await fetch('/api/admin/user/add_balance', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id, amount: parseFloat(amount) }) });
+                alert((await res.json()).message);
+                loadUsers();
+            }
+        }
+        
+        async function addVip(user_id) {
+            const days = prompt('VIP天数');
+            if (days) {
+                const res = await fetch('/api/admin/user/add_vip', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id, days: parseInt(days) }) });
+                alert((await res.json()).message);
+                loadUsers();
+            }
+        }
+        
+        async function addTraffic(user_id) {
+            const gb = prompt('流量(GB)');
+            if (gb) {
+                const res = await fetch('/api/admin/user/add_traffic', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id, gb: parseInt(gb) }) });
+                alert((await res.json()).message);
+                loadUsers();
+            }
+        }
+        
+        async function loadSettings() {
+            const res = await fetch('/api/admin/settings');
+            const d = await res.json();
+            if (d.code === 1) {
+                $('#siteName').val(d.site_name);
+                $('#defaultBalance').val(d.default_balance);
+                $('#signReward').val(d.sign_reward);
+                $('#continuousReward').val(d.continuous_reward);
+                $('#createInstancePrice').val(d.create_instance_price);
+                $('#monthPrice').val(d.month_price);
+                $('#seasonPrice').val(d.season_price);
+                $('#halfYearPrice').val(d.half_year_price);
+                $('#yearPrice').val(d.year_price);
+                $('#traffic1gbPrice').val(d.traffic_1gb_price);
+                $('#traffic10gbPrice').val(d.traffic_10gb_price);
+                $('#traffic30gbPrice').val(d.traffic_30gb_price);
+                $('#traffic100gbPrice').val(d.traffic_100gb_price);
+                $('#traffic500gbPrice').val(d.traffic_500gb_price);
+                $('#normalCardPrice').val(d.normal_card_price);
+                $('#deviceCardPrice').val(d.device_card_price);
+                $('#smtpServer').val(d.smtp_server);
+                $('#smtpPort').val(d.smtp_port);
+                $('#senderEmail').val(d.sender_email);
+            }
+        }
+        
+        async function saveBasicSettings() {
+            const settings = {
+                site_name: $('#siteName').val(),
+                default_balance: parseFloat($('#defaultBalance').val()),
+                sign_reward: parseFloat($('#signReward').val()),
+                continuous_reward: parseFloat($('#continuousReward').val()),
+                create_instance_price: parseFloat($('#createInstancePrice').val())
+            };
+            const res = await fetch('/api/admin/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settings) });
+            alert((await res.json()).message);
+        }
+        
+        async function saveVipPrices() {
+            const settings = {
+                month_price: parseFloat($('#monthPrice').val()),
+                season_price: parseFloat($('#seasonPrice').val()),
+                half_year_price: parseFloat($('#halfYearPrice').val()),
+                year_price: parseFloat($('#yearPrice').val())
+            };
+            const res = await fetch('/api/admin/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settings) });
+            alert((await res.json()).message);
+        }
+        
+        async function saveTrafficPrices() {
+            const settings = {
+                traffic_1gb_price: parseFloat($('#traffic1gbPrice').val()),
+                traffic_10gb_price: parseFloat($('#traffic10gbPrice').val()),
+                traffic_30gb_price: parseFloat($('#traffic30gbPrice').val()),
+                traffic_100gb_price: parseFloat($('#traffic100gbPrice').val()),
+                traffic_500gb_price: parseFloat($('#traffic500gbPrice').val())
+            };
+            const res = await fetch('/api/admin/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settings) });
+            alert((await res.json()).message);
+        }
+        
+        async function saveCardPrices() {
+            const settings = {
+                normal_card_price: parseFloat($('#normalCardPrice').val()),
+                device_card_price: parseFloat($('#deviceCardPrice').val())
+            };
+            const res = await fetch('/api/admin/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settings) });
+            alert((await res.json()).message);
+        }
+        
+        async function saveMailSettings() {
+            const settings = {
+                smtp_server: $('#smtpServer').val(),
+                smtp_port: parseInt($('#smtpPort').val()),
+                sender_email: $('#senderEmail').val(),
+                email_password: $('#emailPassword').val()
+            };
+            const res = await fetch('/api/admin/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settings) });
+            alert((await res.json()).message);
+        }
+        
+        async function loadAllInstances() {
+            const res = await fetch('/api/admin/all_instances');
+            const d = await res.json();
+            if (d.code === 1) {
+                let html = '';
+                d.instances.forEach(i => {
+                    html += `<tr>
+                        <td>${i.owner}</td>
+                        <td>${i.name}</td>
+                        <td>${i.instance_id}</td>
+                        <td><span class="${i.status === 'running' ? 'status-running' : 'status-stopped'}">${i.status === 'running' ? '运行中' : '已停止'}</span></td>
+                    </tr>`;
+                });
+                $('#allInstancesTable').html(html);
+            }
+        }
+        
+        async function loadEncryptionSettings() {
+            const res = await fetch('/api/admin/encryption');
+            const d = await res.json();
+            if (d.code === 1) {
+                $('#enableEncryption').val(d.enable_encryption ? 'true' : 'false');
+                $('#encryptionMethod').val(d.encryption_method);
+                $('#signMethod').val(d.sign_method);
+            }
+        }
+        
+        async function saveEncryptionSettings() {
+            const settings = {
+                enable_encryption: $('#enableEncryption').val() === 'true',
+                encryption_method: $('#encryptionMethod').val(),
+                sign_method: $('#signMethod').val()
+            };
+            const res = await fetch('/api/admin/encryption', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settings) });
+            alert((await res.json()).message);
+        }
+        
+        async function uploadDoc() {
+            const file = $('#docFile')[0]?.files[0];
+            if (!file) return alert('请选择文件');
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const res = await fetch('/api/admin/upload_doc', { method: 'POST', body: formData });
+            const data = await res.json();
+            alert(data.message);
+            if (data.code === 1) loadDocsList();
+        }
+        
+        async function loadDocsList() {
+            const res = await fetch('/api/admin/docs_list');
+            const data = await res.json();
+            if (data.code === 1 && data.files) {
+                let html = '<ul style="list-style: none;">';
+                data.files.forEach(f => {
+                    html += `<li style="padding: 8px 0; display: flex; justify-content: space-between; align-items: center;">
+                        <span><i class="fas fa-file"></i> ${f.name} (${(f.size/1024).toFixed(2)} KB)</span>
+                        <a href="${f.url}" class="btn btn-primary btn-sm" download>下载</a>
+                    </li>`;
+                });
+                html += '</ul>';
+                $('#docsList').html(html || '<div class="empty-state">暂无文档</div>');
+            }
+        }
+        
+        loadStats();
+    </script>
+</body>
+</html>

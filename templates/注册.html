@@ -1,0 +1,351 @@
+<!-- templates/register.html - iOS风格注册页 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AC云验证 - 注册</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        
+        .register-box {
+            width: 100%;
+            max-width: 460px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 34px;
+            padding: 36px 32px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 0.5px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .register-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        
+        .register-header i {
+            font-size: 48px;
+            background: linear-gradient(135deg, #007aff, #5856d6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 16px;
+        }
+        
+        .register-header h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1d1c1f;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 13px;
+            color: #6c6c70;
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+            background: #f5f5f7;
+            border-radius: 14px;
+            border: 0.5px solid rgba(60, 60, 67, 0.08);
+            transition: all 0.2s ease;
+        }
+        
+        .input-group:focus-within {
+            border-color: #007aff;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+        
+        .input-group i {
+            padding: 0 14px;
+            color: #007aff;
+        }
+        
+        .input-group input {
+            flex: 1;
+            padding: 14px 14px 14px 0;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            outline: none;
+            color: #1d1c1f;
+            font-family: inherit;
+        }
+        
+        .code-group {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .code-group input {
+            flex: 1;
+            padding: 14px;
+            border: 0.5px solid rgba(60, 60, 67, 0.08);
+            border-radius: 14px;
+            background: #f5f5f7;
+            outline: none;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        
+        .code-group button {
+            padding: 0 20px;
+            background: #007aff;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+        
+        .code-group button:active {
+            transform: scale(0.98);
+        }
+        
+        .code-group button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #007aff;
+            color: white;
+            margin-top: 10px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+        
+        .footer a {
+            color: #007aff;
+            text-decoration: none;
+        }
+        
+        .error {
+            background: #ffe9e9;
+            color: #ff3b30;
+            padding: 12px 16px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            text-align: center;
+        }
+        
+        .success {
+            background: #e5f5e5;
+            color: #34c759;
+            padding: 12px 16px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            text-align: center;
+        }
+        
+        .back-home {
+            text-align: center;
+            margin-top: 16px;
+        }
+        
+        .back-home a {
+            color: #8e8e93;
+            text-decoration: none;
+            font-size: 12px;
+        }
+        
+        .uid-prefix {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .uid-prefix span {
+            background: linear-gradient(135deg, #007aff, #5856d6);
+            color: white;
+            padding: 14px 16px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .uid-prefix input {
+            flex: 1;
+            padding: 14px;
+            border: 0.5px solid rgba(60, 60, 67, 0.08);
+            border-radius: 14px;
+            background: #f5f5f7;
+            outline: none;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        
+        .uid-prefix input:focus {
+            border-color: #007aff;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+        
+        @media (max-width: 480px) {
+            .register-box {
+                padding: 28px 20px;
+            }
+            .register-header h2 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="register-box">
+            <div class="register-header">
+                <i class="fas fa-user-plus"></i>
+                <h2>注册新账号</h2>
+            </div>
+            {% if error %}
+            <div class="error"><i class="fas fa-exclamation-circle"></i> {{ error }}</div>
+            {% endif %}
+            {% if success %}
+            <div class="success"><i class="fas fa-check-circle"></i> {{ success }}</div>
+            {% endif %}
+            <form method="POST">
+                <div class="form-group">
+                    <label>邮箱地址</label>
+                    <div class="code-group">
+                        <input type="email" name="email" id="email" placeholder="请输入邮箱" required>
+                        <button type="button" id="sendBtn" onclick="sendCode()">发送验证码</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>验证码</label>
+                    <div class="input-group">
+                        <i class="fas fa-code"></i>
+                        <input type="text" name="code" placeholder="请输入验证码" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>用户ID</label>
+                    <div class="uid-prefix">
+                        <span>ID</span>
+                        <input type="text" name="user_id" placeholder="字母数字下划线" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>账号名称</label>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="display_name" placeholder="请输入账号名称" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="password" placeholder="至少6位" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>确认密码</label>
+                    <div class="input-group">
+                        <i class="fas fa-check-circle"></i>
+                        <input type="password" name="confirm_password" placeholder="请再次输入密码" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn">注册</button>
+            </form>
+            <div class="footer">
+                <a href="/login">已有账号？立即登录</a>
+            </div>
+            <div class="back-home">
+                <a href="/">← 返回首页</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        let countdown = 0;
+        async function sendCode() {
+            if (countdown > 0) return;
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert('请先输入邮箱地址');
+                return;
+            }
+            const btn = document.getElementById('sendBtn');
+            btn.disabled = true;
+            btn.textContent = '发送中...';
+            const response = await fetch('/api/send_code', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email: email, purpose: 'register'})
+            });
+            const data = await response.json();
+            if (data.code === 1) {
+                alert('验证码已发送到您的邮箱');
+                countdown = 60;
+                const timer = setInterval(() => {
+                    countdown--;
+                    if (countdown <= 0) {
+                        clearInterval(timer);
+                        btn.disabled = false;
+                        btn.textContent = '发送验证码';
+                    } else {
+                        btn.textContent = `${countdown}秒后重试`;
+                    }
+                }, 1000);
+            } else {
+                alert(data.message);
+                btn.disabled = false;
+                btn.textContent = '发送验证码';
+            }
+        }
+    </script>
+</body>
+</html>
