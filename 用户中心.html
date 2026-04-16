@@ -1,0 +1,1195 @@
+<!-- templates/dashboard.html - iOS风格用户中心 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AC云验证 - 用户中心</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f5f5f7;
+            color: #1d1c1f;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* iOS风格导航栏 */
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 0.5px solid rgba(60, 60, 67, 0.08);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .logo i {
+            font-size: 24px;
+            background: linear-gradient(135deg, #007aff, #5856d6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .balance-badge {
+            background: #34c759;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .vip-badge {
+            background: linear-gradient(135deg, #ff9500, #ffcc00);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .logout-btn {
+            background: none;
+            border: none;
+            color: #ff3b30;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px;
+        }
+        
+        .menu-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: #007aff;
+            display: none;
+        }
+        
+        /* 侧边栏 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 60px;
+            width: 260px;
+            height: calc(100vh - 60px);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 0.5px solid rgba(60, 60, 67, 0.08);
+            overflow-y: auto;
+            z-index: 99;
+        }
+        
+        .nav-item {
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #6c6c70;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: rgba(0, 122, 255, 0.05);
+            color: #007aff;
+        }
+        
+        .nav-item.active {
+            background: rgba(0, 122, 255, 0.1);
+            color: #007aff;
+            border-left-color: #007aff;
+        }
+        
+        .nav-item i {
+            width: 22px;
+            font-size: 16px;
+        }
+        
+        /* 主内容区 */
+        .main {
+            margin-left: 260px;
+            padding: 80px 24px 24px;
+            min-height: 100vh;
+        }
+        
+        /* iOS风格卡片 */
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 0.5px solid rgba(60, 60, 67, 0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-left: 12px;
+            border-left: 4px solid #007aff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 24px 20px;
+            text-align: center;
+            cursor: pointer;
+            border: 0.5px solid rgba(60, 60, 67, 0.08);
+            transition: all 0.2s ease;
+        }
+        
+        .stat-card:active {
+            transform: scale(0.98);
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #007aff;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #6c6c70;
+        }
+        
+        /* 表单 */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #6c6c70;
+            font-size: 13px;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            background: #f5f5f7;
+            border: 0.5px solid rgba(60, 60, 67, 0.08);
+            border-radius: 14px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #007aff;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+        
+        /* 按钮 */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary {
+            background: #007aff;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #34c759;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #ff3b30;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #ff9500;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f5f5f7;
+            color: #007aff;
+        }
+        
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+        
+        /* 表格 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 0.5px solid rgba(60, 60, 67, 0.08);
+        }
+        
+        th {
+            color: #6c6c70;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        /* 实例卡片 */
+        .instance-item {
+            background: #f5f5f7;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 0.5px solid rgba(60, 60, 67, 0.08);
+        }
+        
+        .instance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .instance-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-running {
+            background: #34c759;
+            color: white;
+        }
+        
+        .status-stopped {
+            background: #ff3b30;
+            color: white;
+        }
+        
+        /* 版本列表 */
+        .version-item {
+            background: #f5f5f7;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .version-tag {
+            background: #007aff;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        /* 进度条 */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(60, 60, 67, 0.08);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007aff, #5856d6);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        /* 面板切换 */
+        .panel {
+            display: none;
+        }
+        
+        .panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c6c70;
+        }
+        
+        .code-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .code-group input {
+            flex: 1;
+            font-family: monospace;
+        }
+        
+        /* 弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 28px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .menu-btn {
+                display: block;
+            }
+            .sidebar {
+                left: -260px;
+                transition: left 0.3s ease;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .main {
+                margin-left: 0;
+            }
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.3);
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+                z-index: 98;
+            }
+            .overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div class="logo">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>AC云验证</span>
+        </div>
+        <div class="user-info">
+            <span class="balance-badge" id="balanceDisplay"><i class="fas fa-wallet"></i> ¥{{ user.balance|default(0) }}</span>
+            {% if is_vip %}<span class="vip-badge"><i class="fas fa-crown"></i> VIP</span>{% endif %}
+            <span>{{ user.display_name }}</span>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </div>
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard')"><i class="fas fa-tachometer-alt"></i><span>仪表盘</span></div>
+        <div class="nav-item" data-page="instances" onclick="switchPage('instances')"><i class="fas fa-server"></i><span>应用实例</span></div>
+        <div class="nav-item" data-page="cards" onclick="switchPage('cards')"><i class="fas fa-ticket-alt"></i><span>卡密管理</span></div>
+        <div class="nav-item" data-page="updates" onclick="switchPage('updates')"><i class="fas fa-cloud-upload-alt"></i><span>云更新管理</span></div>
+        <div class="nav-item" data-page="account" onclick="switchPage('account')"><i class="fas fa-user-cog"></i><span>账号信息</span></div>
+        <div class="nav-item" data-page="api" onclick="switchPage('api')"><i class="fas fa-code"></i><span>API对接</span></div>
+    </div>
+    
+    <div class="main">
+        <!-- 仪表盘页面 -->
+        <div id="dashboardPanel" class="panel active">
+            <div class="stats-grid">
+                <div class="stat-card" onclick="switchPage('account')">
+                    <div class="stat-value" id="statBalance">¥{{ user.balance|default(0) }}</div>
+                    <div class="stat-label">账户余额</div>
+                </div>
+                <div class="stat-card" onclick="switchPage('account')">
+                    <div class="stat-value" id="statVip">{% if is_vip %}VIP{% else %}普通{% endif %}</div>
+                    <div class="stat-label">会员状态</div>
+                </div>
+                <div class="stat-card" onclick="doSignin()">
+                    <div class="stat-value" id="signBtn">签到</div>
+                    <div class="stat-label" id="signInfo">连续0天</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">余额明细</div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr><th>名称</th><th>金额变动</th><th>时间</th><th>当前余额</th></tr>
+                        </thead>
+                        <tbody id="balanceLogsList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 实例管理页面 -->
+        <div id="instancesPanel" class="panel">
+            <div class="card">
+                <div class="card-title">创建应用</div>
+                <div class="form-group"><input type="text" id="instanceName" placeholder="应用名称"></div>
+                <div class="form-group"><input type="text" id="instanceId" placeholder="应用ID (如: myapp)"></div>
+                <button class="btn btn-primary" onclick="createInstance()"><i class="fas fa-plus"></i> 创建应用</button>
+            </div>
+            <div class="card">
+                <div class="card-title">应用实例</div>
+                <div id="instancesList"></div>
+            </div>
+        </div>
+        
+        <!-- 卡密管理页面 -->
+        <div id="cardsPanel" class="panel">
+            <div class="card">
+                <div class="card-title">创建卡密</div>
+                <div class="form-group">
+                    <label>选择应用</label>
+                    <select id="cardInstanceSelect" style="width:100%"></select>
+                </div>
+                <div class="form-group">
+                    <label>卡密类型</label>
+                    <select id="cardTypeSelect" style="width:100%">
+                        <option value="normal">普通卡密</option>
+                        <option value="device">设备卡密</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>有效时长</label>
+                    <select id="cardDays" style="width:100%">
+                        <option value="1">1天</option>
+                        <option value="7">7天</option>
+                        <option value="30">30天</option>
+                        <option value="90">90天</option>
+                        <option value="180">180天</option>
+                        <option value="365">365天</option>
+                        <option value="0">永久</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>卡密前缀（可选）</label>
+                    <input type="text" id="cardPrefix" placeholder="如: AC">
+                </div>
+                <div class="form-group">
+                    <label>批量生成数量</label>
+                    <input type="number" id="cardQuantity" value="1" min="1" max="100">
+                </div>
+                <div class="form-group">
+                    <label>自定义卡密（单个时生效）</label>
+                    <input type="text" id="customCard" placeholder="留空自动生成">
+                </div>
+                <button class="btn btn-primary" onclick="createCard()"><i class="fas fa-ticket-alt"></i> 生成卡密</button>
+            </div>
+            <div class="card">
+                <div class="card-title">卡密管理</div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr><th>卡密号码</th><th>类型</th><th>时长</th><th>状态</th><th>操作</th></tr>
+                        </thead>
+                        <tbody id="cardsList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 云更新管理页面 -->
+        <div id="updatesPanel" class="panel">
+            <div class="card">
+                <div class="card-title">
+                    云更新管理
+                    <span id="storageInfo" style="font-size:12px; color:#6c6c70;"></span>
+                </div>
+                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="stat-card"><div class="stat-value" id="storageUsed">0</div><div class="stat-label">容量使用</div></div>
+                    <div class="stat-card"><div class="stat-value" id="currentVersion">-</div><div class="stat-label">当前版本</div></div>
+                    <div class="stat-card" onclick="showTrafficModal()"><div class="stat-value" id="remainingTraffic">0 GB</div><div class="stat-label">剩余流量 <i class="fas fa-arrow-right"></i> 充值</div></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">上传文件</div>
+                <div class="form-group">
+                    <label>选择应用</label>
+                    <select id="updateInstanceSelect" style="width:100%"></select>
+                </div>
+                <div class="form-group"><label>版本号</label><input type="text" id="versionInput" placeholder="例如: 1.0.0"></div>
+                <div class="form-group"><label>显示名称</label><input type="text" id="displayNameInput" placeholder="客户端显示的名称"></div>
+                <div class="form-group"><label>更新说明</label><textarea id="updateDesc" rows="3" placeholder="更新内容..."></textarea></div>
+                <div class="form-group"><label>选择文件</label><input type="file" id="fileInput"></div>
+                <div class="upload-progress" id="uploadProgress" style="display:none;">
+                    <div>上传中... <span id="progressPercent">0</span>%</div>
+                    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                </div>
+                <button class="btn btn-primary" onclick="uploadUpdate()"><i class="fas fa-upload"></i> 上传文件</button>
+            </div>
+            <div class="card">
+                <div class="card-title">历史版本</div>
+                <div id="updateFilesList"></div>
+            </div>
+        </div>
+        
+        <!-- 账号信息页面 -->
+        <div id="accountPanel" class="panel">
+            <div class="card">
+                <div class="card-title">基本信息</div>
+                <div class="form-group"><label>用户ID</label><input type="text" id="accountUserId" readonly></div>
+                <div class="form-group"><label>账号名称</label><input type="text" id="accountName" placeholder="账号名称"></div>
+                <div class="form-group"><label>邮箱</label><input type="email" id="accountEmail" readonly></div>
+                <div class="form-group"><label>会员状态</label><input type="text" id="accountVip" readonly></div>
+                <button class="btn btn-primary" onclick="updateProfile()">修改名称</button>
+            </div>
+            <div class="card">
+                <div class="card-title">修改密码</div>
+                <div class="form-group"><input type="password" id="oldPassword" placeholder="原密码"></div>
+                <div class="form-group"><input type="password" id="newPassword" placeholder="新密码"></div>
+                <div class="form-group"><input type="password" id="confirmPassword" placeholder="确认新密码"></div>
+                <button class="btn btn-warning" onclick="changePassword()">修改密码</button>
+            </div>
+            <div class="card">
+                <div class="card-title">登录记录</div>
+                <div style="overflow-x: auto;">
+                    <table><thead><tr><th>登录IP</th><th>登录时间</th></tr></thead><tbody id="loginLogsList"></tbody></table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- API对接页面 -->
+        <div id="apiPanel" class="panel">
+            <div class="card">
+                <div class="card-title">API对接文档</div>
+                <p style="margin-bottom: 16px; color: #6c6c70;">以下是对接所需的API接口信息，请根据您的开发语言选择对应的对接示例。</p>
+                <div style="background: #f5f5f7; border-radius: 14px; padding: 20px; margin-bottom: 16px;">
+                    <h4 style="margin-bottom: 12px;"><i class="fas fa-link"></i> API基础地址</h4>
+                    <code style="background: #fff; padding: 8px 12px; border-radius: 10px; display: block;">http://{{ request.host }}/api/</code>
+                </div>
+                <div style="background: #f5f5f7; border-radius: 14px; padding: 20px; margin-bottom: 16px;">
+                    <h4 style="margin-bottom: 12px;"><i class="fas fa-key"></i> 卡密验证接口</h4>
+                    <p><strong>接口地址:</strong> POST /api/verify</p>
+                    <p><strong>参数说明:</strong></p>
+                    <ul style="margin-left: 20px; color: #6c6c70;">
+                        <li>card_password: 卡密号码</li>
+                        <li>instance_id: 实例ID</li>
+                        <li>device_id: 设备ID（设备卡需要）</li>
+                        <li>user_id: 用户ID（可选）</li>
+                    </ul>
+                </div>
+                <div style="background: #f5f5f7; border-radius: 14px; padding: 20px; margin-bottom: 16px;">
+                    <h4 style="margin-bottom: 12px;"><i class="fas fa-cloud-download-alt"></i> 云更新接口</h4>
+                    <p><strong>检查更新:</strong> POST /api/check_update</p>
+                    <p><strong>下载文件:</strong> GET /api/download/{user_id}/{instance_id}/{version}</p>
+                </div>
+                <div style="background: #f5f5f7; border-radius: 14px; padding: 20px; margin-bottom: 16px;">
+                    <h4 style="margin-bottom: 12px;"><i class="fas fa-bullhorn"></i> 公告接口</h4>
+                    <p><strong>接口地址:</strong> POST /api/get_announcement</p>
+                    <p><strong>参数:</strong> instance_id, user_id</p>
+                </div>
+                <div style="background: #f5f5f7; border-radius: 14px; padding: 20px;">
+                    <h4 style="margin-bottom: 12px;"><i class="fas fa-shield-alt"></i> 加密说明</h4>
+                    <p style="color: #6c6c70;">加密传输开启时，所有请求需要按照以下格式发送：</p>
+                    <pre style="background: #fff; padding: 12px; border-radius: 10px; overflow-x: auto; font-size: 12px;">
+{
+    "data": "base64编码的数据",
+    "sign": "MD5或HMAC-SHA256签名",
+    "timestamp": 1234567890
+}
+                    </pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 流量充值弹窗 -->
+    <div id="trafficModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 20px;">充值流量</h3>
+            <div class="form-group">
+                <label>流量包</label>
+                <select id="trafficSelect" style="width:100%">
+                    <option value="1">1GB - ¥1.5</option>
+                    <option value="10">10GB - ¥10</option>
+                    <option value="30">30GB - ¥20</option>
+                    <option value="100">100GB - ¥60</option>
+                    <option value="500">500GB - ¥200</option>
+                </select>
+            </div>
+            <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:20px;">
+                <button class="btn btn-secondary" onclick="closeTrafficModal()">取消</button>
+                <button class="btn btn-primary" onclick="buyTraffic()">确认充值</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentUser = {{ user|tojson }};
+        
+        function toggleSidebar() {
+            $('#sidebar').toggleClass('open');
+            $('#overlay').toggleClass('active');
+        }
+        
+        function closeSidebar() {
+            $('#sidebar').removeClass('open');
+            $('#overlay').removeClass('active');
+        }
+        
+        function logout() {
+            window.location.href = '/logout';
+        }
+        
+        function switchPage(page) {
+            closeSidebar();
+            $('.panel').removeClass('active');
+            $('#' + page + 'Panel').addClass('active');
+            $('.nav-item').removeClass('active');
+            $(`.nav-item[data-page="${page}"]`).addClass('active');
+            
+            if (page === 'dashboard') { loadBalanceLogs(); loadSignInfo(); }
+            if (page === 'instances') { loadInstances(); }
+            if (page === 'cards') { loadCardInstances(); loadCardsList(); }
+            if (page === 'updates') { loadUpdateInstances(); loadStorageInfo(); loadTrafficInfo(); }
+            if (page === 'account') { loadProfile(); loadLoginLogs(); }
+        }
+        
+        // 仪表盘
+        async function loadBalanceLogs() {
+            const res = await fetch('/api/user/balance/logs');
+            const data = await res.json();
+            if (data.code === 1) {
+                let html = '';
+                (data.logs || []).slice(0, 10).forEach(log => {
+                    html += `<tr><td>${log.name}</td><td style="color:${log.amount>0?'#34c759':'#ff3b30'}">${log.amount>0?'+'+log.amount:log.amount}</td><td>${log.time}</td><td>¥${log.balance}</td></tr>`;
+                });
+                $('#balanceLogsList').html(html || '<tr><td colspan="4" class="empty-state">暂无记录</td></tr>');
+            }
+        }
+        
+        async function loadSignInfo() {
+            const res = await fetch('/api/user/info');
+            const data = await res.json();
+            if (data.code === 1) {
+                $('#statBalance').text('¥' + data.balance);
+                $('#balanceDisplay').html('<i class="fas fa-wallet"></i> ¥' + data.balance);
+            }
+        }
+        
+        async function doSignin() {
+            const res = await fetch('/api/user/signin', { method: 'POST' });
+            const data = await res.json();
+            if (data.code === 1) {
+                alert(`签到成功！获得 ¥${data.reward}`);
+                $('#statBalance').text('¥' + data.balance);
+                $('#balanceDisplay').html('<i class="fas fa-wallet"></i> ¥' + data.balance);
+                $('#signInfo').text(`连续${data.continuous_days}天`);
+                loadBalanceLogs();
+            } else {
+                alert(data.message);
+            }
+        }
+        
+        // 实例管理
+        async function loadInstances() {
+            const res = await fetch('/api/instances');
+            const data = await res.json();
+            if (data.code === 1 && data.instances.length > 0) {
+                let html = '';
+                for (const inst of data.instances) {
+                    const statusRes = await fetch(`/api/instances/${inst.instance_id}/status`);
+                    const status = await statusRes.json();
+                    html += `<div class="instance-item">
+                        <div class="instance-header">
+                            <div><span class="instance-name">${inst.name}</span> <span style="color:#6c6c70;">(${inst.instance_id})</span></div>
+                            <span class="status-badge ${status.status === 'running' ? 'status-running' : 'status-stopped'}">${status.status === 'running' ? '运行中' : '已停止'}</span>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button class="btn ${status.status === 'running' ? 'btn-warning' : 'btn-success'} btn-sm" onclick="toggleInstance('${inst.instance_id}')"><i class="fas ${status.status === 'running' ? 'fa-stop' : 'fa-play'}"></i> ${status.status === 'running' ? '停止' : '启动'}</button>
+                            <button class="btn btn-secondary btn-sm" onclick="showConfig('${inst.instance_id}')"><i class="fas fa-cog"></i> 传输设置</button>
+                            <button class="btn btn-secondary btn-sm" onclick="showSignConfig('${inst.instance_id}')"><i class="fas fa-signature"></i> 签名校验</button>
+                            <button class="btn btn-secondary btn-sm" onclick="showAnnouncement('${inst.instance_id}')"><i class="fas fa-bullhorn"></i> 设置公告</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteInstance('${inst.instance_id}')"><i class="fas fa-trash"></i> 删除</button>
+                        </div>
+                        <div id="config_${inst.instance_id}" style="display:none; margin-top:16px;"></div>
+                    </div>`;
+                }
+                $('#instancesList').html(html);
+            } else {
+                $('#instancesList').html('<div class="empty-state">暂无应用，请创建应用</div>');
+            }
+        }
+        
+        async function createInstance() {
+            const name = $('#instanceName').val().trim();
+            const instance_id = $('#instanceId').val().trim();
+            if (!name || !instance_id) return alert('请填写完整');
+            const res = await fetch('/api/instances/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, instance_id }) });
+            const data = await res.json();
+            alert(data.message);
+            if (data.code === 1) {
+                $('#instanceName,#instanceId').val('');
+                loadInstances();
+                if (data.balance !== undefined) $('#balanceDisplay').html('<i class="fas fa-wallet"></i> ¥' + data.balance);
+            }
+        }
+        
+        async function toggleInstance(instance_id) {
+            const res = await fetch(`/api/instances/${instance_id}/toggle`, { method: 'POST' });
+            const data = await res.json();
+            alert(data.message);
+            if (data.code === 1) loadInstances();
+        }
+        
+        async function deleteInstance(instance_id) {
+            if (!confirm('确定删除此应用吗？')) return;
+            const res = await fetch(`/api/instances/${instance_id}/delete`, { method: 'DELETE' });
+            const data = await res.json();
+            alert(data.message);
+            if (data.code === 1) loadInstances();
+        }
+        
+        async function showConfig(instance_id) {
+            const div = $(`#config_${instance_id}`);
+            if (div.is(':visible')) { div.hide(); return; }
+            const res = await fetch(`/api/instances/${instance_id}/config`);
+            const data = await res.json();
+            if (data.code === 1) {
+                div.html(`
+                    <div class="form-group"><label>加密方式</label><select id="encryptMethod_${instance_id}"><option value="base64">base64编码</option></select></div>
+                    <div class="form-group"><label>加密密钥</label><input type="text" id="encryptKey_${instance_id}" value="${data.config.encryption_key || ''}"></div>
+                    <button class="btn btn-primary btn-sm" onclick="saveConfig('${instance_id}')">保存</button>
+                `).show();
+            }
+        }
+        
+        async function saveConfig(instance_id) {
+            const config = {
+                encryption_method: $(`#encryptMethod_${instance_id}`).val(),
+                encryption_key: $(`#encryptKey_${instance_id}`).val()
+            };
+            const res = await fetch(`/api/instances/${instance_id}/config`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(config) });
+            const data = await res.json();
+            alert(data.message);
+        }
+        
+        async function showSignConfig(instance_id) {
+            const div = $(`#config_${instance_id}`);
+            if (div.is(':visible')) { div.hide(); return; }
+            const res = await fetch(`/api/instances/${instance_id}/config`);
+            const data = await res.json();
+            if (data.code === 1) {
+                div.html(`
+                    <div class="form-group"><label>签名方式</label><select id="signMethod_${instance_id}"><option value="md5">MD5签名</option><option value="hmac_sha256">HMAC-SHA256</option></select></div>
+                    <div class="form-group"><label>签名密钥</label><input type="text" id="signKey_${instance_id}" value="${data.config.sign_key || ''}"></div>
+                    <button class="btn btn-primary btn-sm" onclick="saveSignConfig('${instance_id}')">保存</button>
+                `).show();
+            }
+        }
+        
+        async function saveSignConfig(instance_id) {
+            const config = {
+                sign_method: $(`#signMethod_${instance_id}`).val(),
+                sign_key: $(`#signKey_${instance_id}`).val()
+            };
+            const res = await fetch(`/api/instances/${instance_id}/config`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(config) });
+            const data = await res.json();
+            alert(data.message);
+        }
+        
+        async function showAnnouncement(instance_id) {
+            const div = $(`#config_${instance_id}`);
+            if (div.is(':visible')) { div.hide(); return; }
+            const res = await fetch(`/api/instances/${instance_id}/config`);
+            const data = await res.json();
+            div.html(`
+                <div class="form-group"><textarea id="announcement_${instance_id}" rows="3" placeholder="公告内容...">${data.config.announcement || ''}</textarea></div>
+                <button class="btn btn-primary btn-sm" onclick="saveAnnouncement('${instance_id}')">保存</button>
+            `).show();
+        }
+        
+        async function saveAnnouncement(instance_id) {
+            const announcement = $(`#announcement_${instance_id}`).val();
+            const res = await fetch(`/api/instances/${instance_id}/config`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ announcement }) });
+            const data = await res.json();
+            alert(data.message);
+        }
+        
+        // 卡密管理
+        async function loadCardInstances() {
+            const res = await fetch('/api/instances');
+            const data = await res.json();
+            if (data.code === 1) {
+                let html = '<option value="">请选择应用</option>';
+                data.instances.forEach(inst => html += `<option value="${inst.instance_id}">${inst.name} (${inst.instance_id})</option>`);
+                $('#cardInstanceSelect').html(html);
+            }
+        }
+        
+        async function loadCardsList() {
+            const res = await fetch('/api/cards');
+            const data = await res.json();
+            if (data.code === 1) {
+                let html = '';
+                (data.cards || []).forEach(card => {
+                    const status = card.used ? '已使用' : '未使用';
+                    html += `<tr>
+                        <td><code>${card.card_password}</code><button class="btn btn-secondary btn-sm" onclick="copyToClipboard('${card.card_password}')">复制</button></td>
+                        <td>${card.type === 'normal' ? '普通卡密' : '设备卡密'}</td>
+                        <td>${card.valid_days === 0 ? '永久' : card.valid_days + '天'}</td>
+                        <td>${status}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="extendCard('${card.card_password}')">加时</button>
+                            ${card.type === 'device' && card.used ? `<button class="btn btn-primary btn-sm" onclick="unbindCard('${card.card_password}')">解绑</button>` : ''}
+                            <button class="btn btn-danger btn-sm" onclick="deleteCard('${card.card_password}')">删除</button>
+                        </td>
+                    </table>`;
+                });
+                $('#cardsList').html(html || '<tr><td colspan="5" class="empty-state">暂无卡密</td></tr>');
+            }
+        }
+        
+        async function createCard() {
+            const instance_id = $('#cardInstanceSelect').val();
+            const card_type = $('#cardTypeSelect').val();
+            const valid_days = parseInt($('#cardDays').val());
+            const prefix = $('#cardPrefix').val().trim();
+            const quantity = parseInt($('#cardQuantity').val());
+            const custom_card = $('#customCard').val().trim();
+            
+            if (!instance_id) return alert('请选择应用');
+            if (quantity > 100) return alert('单次最多生成100个');
+            
+            const res = await fetch('/api/cards/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ instance_id, card_type, valid_days, prefix, quantity, custom_card }) });
+            const data = await res.json();
+            if (data.code === 1) {
+                if (data.cards.length === 1) {
+                    alert(`卡密创建成功：${data.cards[0]}`);
+                    copyToClipboard(data.cards[0]);
+                } else {
+                    alert(`成功生成 ${data.cards.length} 个卡密`);
+                }
+                loadCardsList();
+                $('#balanceDisplay').html('<i class="fas fa-wallet"></i> ¥' + data.balance);
+                $('#customCard').val('');
+            } else {
+                alert(data.message);
+            }
+        }
+        
+        async function extendCard(card_password) {
+            const add_days = prompt('增加天数', '30');
+            if (add_days && !isNaN(add_days) && add_days > 0) {
+                const res = await fetch('/api/cards/extend', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ card_password, add_days: parseInt(add_days) }) });
+                const data = await res.json();
+                alert(data.message);
+                if (data.code === 1) loadCardsList();
+            }
+        }
+        
+        async function unbindCard(card_password) {
+            if (confirm('确定解绑此设备卡吗？')) {
+                const res = await fetch('/api/cards/unbind', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ card_password }) });
+                const data = await res.json();
+                alert(data.message);
+                if (data.code === 1) loadCardsList();
+            }
+        }
+        
+        async function deleteCard(card_password) {
+            if (confirm('确定删除此卡密吗？')) {
+                const res = await fetch('/api/cards/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ card_password }) });
+                const data = await res.json();
+                alert(data.message);
+                if (data.code === 1) loadCardsList();
+            }
+        }
+        
+        // 云更新管理
+        async function loadUpdateInstances() {
+            const res = await fetch('/api/instances');
+            const data = await res.json();
+            if (data.code === 1) {
+                let html = '<option value="">请选择应用</option>';
+                data.instances.forEach(inst => html += `<option value="${inst.instance_id}">${inst.name} (${inst.instance_id})</option>`);
+                $('#updateInstanceSelect').html(html);
+                $('#updateInstanceSelect').off('change').on('change', loadUpdateFiles);
+            }
+        }
+        
+        async function loadUpdateFiles() {
+            const instance_id = $('#updateInstanceSelect').val();
+            if (!instance_id) { $('#updateFilesList').html(''); return; }
+            const res = await fetch(`/api/updates/${instance_id}`);
+            const data = await res.json();
+            if (data.code === 1) {
+                $('#storageUsed').text(data.used_storage_mb + ' MB / ' + data.limit_storage_mb + ' MB');
+                $('#currentVersion').text(data.current_version || '-');
+                if (data.files && data.files.length > 0) {
+                    let html = '';
+                    data.files.forEach(file => {
+                        html += `<div class="version-item">
+                            <div><span class="version-tag">v${file.version}</span> <strong>${file.display_name}</strong> (${file.size_mb} MB)</div>
+                            <div style="font-size:12px;">${file.update_desc || '无说明'} | ${file.upload_time}</div>
+                            <div style="display:flex; gap:8px;">
+                                <button class="btn btn-success btn-sm" onclick="setCurrentVersion('${instance_id}', '${file.version}')">设置版本</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteUpdate('${instance_id}', '${file.version}')">删除</button>
+                            </div>
+                        </div>`;
+                    });
+                    $('#updateFilesList').html(html);
+                } else {
+                    $('#updateFilesList').html('<div class="empty-state">暂无更新文件</div>');
+                }
+            }
+        }
+        
+        async function uploadUpdate() {
+            const instance_id = $('#updateInstanceSelect').val();
+            const version = $('#versionInput').val().trim();
+            const display_name = $('#displayNameInput').val().trim();
+            const update_desc = $('#updateDesc').val().trim();
+            const file = $('#fileInput')[0]?.files[0];
+            
+            if (!instance_id || !version || !file) return alert('请填写完整');
+            
+            const formData = new FormData();
+            formData.append('instance_id', instance_id);
+            formData.append('version', version);
+            formData.append('display_name', display_name);
+            formData.append('update_desc', update_desc);
+            formData.append('file', file);
+            
+            $('#uploadProgress').show();
+            const xhr = new XMLHttpRequest();
+            xhr.upload.addEventListener('progress', function(e) {
+                if (e.lengthComputable) {
+                    const percent = Math.round(e.loaded / e.total * 100);
+                    $('#progressPercent').text(percent);
+                    $('#progressFill').css('width', percent + '%');
+                }
+            });
+            xhr.onload = function() {
+                $('#uploadProgress').hide();
+                try {
+                    const data = JSON.parse(xhr.responseText);
+                    alert(data.message);
+                    if (data.code === 1) {
+                        loadUpdateFiles();
+                        loadStorageInfo();
+                        loadTrafficInfo();
+                        $('#versionInput').val('');
+                        $('#displayNameInput').val('');
+                        $('#updateDesc').val('');
+                        $('#fileInput').val('');
+                    }
+                } catch(e) { alert('上传失败'); }
+            };
+            xhr.onerror = function() { $('#uploadProgress').hide(); alert('上传失败'); };
+            xhr.open('POST', '/api/updates/upload');
+            xhr.send(formData);
+        }
+        
+        async function setCurrentVersion(instance_id, version) {
+            const res = await fetch('/api/updates/set_version', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ instance_id, version }) });
+            const data = await res.json();
+            alert(data.message);
+            if (data.code === 1) $('#currentVersion').text(version);
+        }
+        
+        async function deleteUpdate(instance_id, version) {
+            if (!confirm('确定删除此版本吗？')) return;
+            const res = await fetch('/api/updates/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ instance_id, version }) });
+            const data = await res.json();
+            alert(data.message);
+            if (data.code === 1) loadUpdateFiles();
+        }
+        
+        async function loadStorageInfo() {
+            const instance_id = $('#updateInstanceSelect').val();
+            if (!instance_id) return;
+            const res = await fetch(`/api/updates/${instance_id}`);
+            const data = await res.json();
+            if (data.code === 1) {
+                $('#storageUsed').text(data.used_storage_mb + ' MB / ' + data.limit_storage_mb + ' MB');
+                $('#storageInfo').html(`容量使用 ${Math.round(data.used_storage_mb / data.limit_storage_mb * 100)}%`);
+            }
+        }
+        
+        async function loadTrafficInfo() {
+            const res = await fetch('/api/traffic/info');
+            const data = await res.json();
+            if (data.code === 1) $('#remainingTraffic').text(data.remaining_gb + ' GB');
+        }
+        
+        function showTrafficModal() { $('#trafficModal').css('display', 'flex'); }
+        function closeTrafficModal() { $('#trafficModal').hide(); }
+        
+        async function buyTraffic() {
+            const gb = parseInt($('#trafficSelect').val());
+            const res = await fetch('/api/traffic/buy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ gb }) });
+            const data = await res.json();
+            alert(data.message);
+            if (data.code === 1) {
+                $('#remainingTraffic').text(data.remaining_gb + ' GB');
+                $('#balanceDisplay').html('<i class="fas fa-wallet"></i> ¥' + data.balance);
+                closeTrafficModal();
+            }
+        }
+        
+        // 账号信息
+        async function loadProfile() {
+            const res = await fetch('/api/user/info');
+            const data = await res.json();
+            if (data.code === 1) {
+                $('#accountUserId').val(data.user_id);
+                $('#accountName').val(data.display_name);
+                $('#accountEmail').val(data.email);
+                $('#accountVip').val(data.is_vip ? `VIP会员 剩余${data.vip_days}天` : '普通用户');
+            }
+        }
+        
+        async function updateProfile() {
+            const display_name = $('#accountName').val().trim();
+            if (!display_name) return alert('请输入账号名称');
+            const res = await fetch('/api/user/update_name', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ display_name }) });
+            const data = await res.json();
+            alert(data.message);
+            if (data.code === 1) location.reload();
+        }
+        
+        async function loadLoginLogs() {
+            const res = await fetch('/api/user/login/logs');
+            const data = await res.json();
+            if (data.code === 1) {
+                let html = '';
+                (data.logs || []).slice(0, 10).forEach(log => {
+                    html += `<tr><td>${log.ip}</td><td>${log.time}</td></tr>`;
+                });
+                $('#loginLogsList').html(html || '<tr><td colspan="2" class="empty-state">暂无记录</td></tr>');
+            }
+        }
+        
+        async function changePassword() {
+            const old_password = $('#oldPassword').val();
+            const new_password = $('#newPassword').val();
+            const confirm_password = $('#confirmPassword').val();
+            if (!old_password || !new_password) return alert('请填写完整');
+            if (new_password !== confirm_password) return alert('两次密码不一致');
+            if (new_password.length < 6) return alert('密码至少6位');
+            const res = await fetch('/api/user/change_password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ old_password, new_password }) });
+            const data = await res.json();
+            alert(data.message);
+            if (data.code === 1) $('#oldPassword,#newPassword,#confirmPassword').val('');
+        }
+        
+        // 工具函数
+        async function copyToClipboard(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                alert('已复制');
+            } catch(e) {
+                prompt('手动复制', text);
+            }
+        }
+    </script>
+</body>
+</html>
